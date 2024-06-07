@@ -1,0 +1,79 @@
+.create-event-modal {
+  width: 522px;
+  height: 446px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.edit-calendar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-create-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title-label {
+  font-weight: bold;
+}
+
+.form-control {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.date-dropdown {
+  position: relative;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.clock-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.selected-date {
+  font-size: 14px;
+}
+
+.date-dropdown .datepicker {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
