@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./components/header/header";
 import Button from "./components/button/button";
 import Datepicker from "./components/datepicker/date";
 import CalendarList from "./components/calendarList/calendarList";
 import CentralCalendar from "./components/centralCalendar/centralCalendar";
 import CreateEventModal from "./components/createEventModal/createEventModal";
+import { fetchCalendars } from "./assets/api/calendars";
 
 import "./App.css";
 
@@ -15,7 +16,15 @@ function App() {
   const [selectedView, setSelectedView] = useState("Week");
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const calendarList = await fetchCalendars();
+      setCalendars(calendarList);
+    };
+
+    fetchData();
+  }, []);
 
   const handleEditCalendar = (updatedCalendar) => {
     setCalendars((prevCalendars) =>
@@ -48,14 +57,17 @@ function App() {
   };
 
   const handleEventAdded = (newEvent) => {
-    setEvents([...events, newEvent]);
-    setSelectedEvent(newEvent);
+    setEvents((prevEvents) => [...prevEvents, newEvent]);
+  };
+
+  const handleEventsChange = (newEvents) => {
+    setEvents(newEvents);
   };
 
   return (
     <>
       <Header selectedView={selectedView} onViewChange={handleViewChange} />
-      <div className="button-container">
+      <button className="button-container">
         <Button
           type={"longer"}
           disabled={false}
@@ -63,7 +75,7 @@ function App() {
         >
           Create
         </Button>
-      </div>
+      </button>
       <Datepicker value={selectedDate} onChange={handleDateChange} />
       <CalendarList
         calendars={calendars}
@@ -75,13 +87,14 @@ function App() {
         date={selectedDate}
         view={selectedView}
         events={events}
+        setEvents={setEvents}
       />
       {isCreateEventModalOpen && (
         <CreateEventModal
           selectedDate={selectedDate}
           onClose={() => setIsCreateEventModalOpen(false)}
           onEventAdded={handleEventAdded}
-          selectedEvent={selectedEvent}
+          calendars={calendars}
         />
       )}
     </>

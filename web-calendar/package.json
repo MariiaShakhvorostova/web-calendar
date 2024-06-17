@@ -31,7 +31,7 @@
     "@storybook/react-vite": "^8.0.8",
     "@storybook/test": "^8.0.8",
     "@testing-library/react": "^15.0.6",
-    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/react-hooks": "^7.0.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react-swc": "^3.5.0",
@@ -52,6 +52,12 @@
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
       "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    }
+  },
+  "overrides": {
+    "@testing-library/react-hooks": {
+      "react": "^18.0.0",
+      "react-dom": "^18.0.0"
     }
   }
 }

@@ -89,6 +89,8 @@
 }
 
 .save-button {
+  background: transparent;
+  border: transparent;
   position: absolute;
   top: 295px;
   left: 180px;

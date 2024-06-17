@@ -1,19 +1,11 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-import { db } from "../../../firebase";
 import "./dayView.css";
+import { fetchEvents, deleteEvent, updateEvent } from "../../assets/api/events";
 import EventInformationModal from "../eventInfModal/eventInfModal";
 
-const DayView = ({ selectedDate }) => {
-  const [events, setEvents] = useState([]);
+const DayView = ({ selectedDate, events, setEvents }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const times = Array.from({ length: 24 }, (_, i) => {
@@ -23,34 +15,41 @@ const DayView = ({ selectedDate }) => {
   });
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const eventsCollectionRef = collection(db, "events");
-      const querySnapshot = await getDocs(eventsCollectionRef);
-      const eventsData = [];
-      querySnapshot.forEach((doc) => {
-        const eventData = doc.data();
-        eventsData.push({ ...eventData, id: doc.id });
-      });
-      setEvents(eventsData);
+    const fetchData = async () => {
+      try {
+        const eventsData = await fetchEvents();
+        setEvents(eventsData);
+      } catch (error) {
+        console.error("Error fetching events:", error.message, error.code);
+      }
     };
-    fetchEvents();
-  }, [selectedDate]);
+    fetchData();
+  });
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
   };
 
   const handleDelete = async (id) => {
-    await deleteDoc(doc(db, "events", id));
-    setEvents(events.filter((event) => event.id !== id));
-    setSelectedEvent(null);
+    try {
+      await deleteEvent(id);
+      setEvents(events.filter((event) => event.id !== id));
+      setSelectedEvent(null);
+    } catch (error) {
+      console.error("Error deleting event:", error.message, error.code);
+    }
   };
 
   const handleEdit = async (id, updatedEvent) => {
-    const eventDoc = doc(db, "events", id);
-    await updateDoc(eventDoc, updatedEvent);
-    setEvents(events.map((event) => (event.id === id ? updatedEvent : event)));
-    setSelectedEvent(null);
+    try {
+      await updateEvent(id, updatedEvent);
+      setEvents(
+        events.map((event) => (event.id === id ? updatedEvent : event))
+      );
+      setSelectedEvent(null);
+    } catch (error) {
+      console.error("Error updating event:", error.message, error.code);
+    }
   };
 
   const closeEventInformationModal = () => {

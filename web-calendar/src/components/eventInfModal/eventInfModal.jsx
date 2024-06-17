@@ -10,9 +10,7 @@ const EventInformationModal = ({ event, onClose, onEdit, onDelete }) => {
       <div className="modal-content">
         <div className="modal-header">
           <h2>Event Information</h2>
-          <button className="close-button" onClick={onClose}>
-            &times;
-          </button>
+          <button className="close-button" onClick={onClose}></button>
         </div>
         <div className="modal-body">
           <div className="event-detail">

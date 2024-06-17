@@ -1,19 +1,31 @@
+.modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .create-event-modal {
   width: 522px;
-  height: 446px;
+  height: 436px;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
 .close-button {
@@ -21,6 +33,30 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
+  width: 16px;
+  right: 30px;
+  position: absolute;
+  height: 16px;
+  background: url("/src/assets/imgs/x.png");
+}
+
+.time-selectors {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.add-time-label {
+  margin-top: 1px;
+}
+
+.create-line {
+  width: 498px;
+  height: 1px;
+  background: #dedfe5;
+  position: absolute;
+  right: 35px;
+  top: 60px;
 }
 
 .edit-calendar-form {
@@ -32,17 +68,19 @@
 .form-create-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .title-label {
   font-weight: bold;
 }
 
-.form-control {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.add-title {
+  margin: 5px 0px 5px 30px;
+}
+
+.create-add-form {
+  width: 456px;
+  border-bottom: 1px solid #323749;
 }
 
 .date-dropdown {
@@ -58,11 +96,17 @@
 .clock-icon {
   width: 16px;
   height: 16px;
-  margin-right: 8px;
+  margin-right: 4px;
+  margin-left: 4px;
 }
 
 .selected-date {
   font-size: 14px;
+  margin-left: 6px;
+  margin-top: 5px;
+  font-size: 16px;
+  color: #323749;
+  width: 200px;
 }
 
 .date-dropdown .datepicker {
@@ -76,4 +120,169 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  background: transparent;
+  border: transparent;
+}
+
+.title-create-icon {
+  background: url(/src/assets/imgs/titleT-icon.png);
+  width: 16px;
+  position: absolute;
+  top: 97px;
+  left: 25px;
+  height: 16px;
+}
+
+.create-event-modal .check-allDay {
+  display: flex;
+  flex-direction: row;
+}
+
+.check-allDay .wrap {
+  width: 150px;
+}
+
+.add-time {
+  width: 240px;
+}
+
+.create-event-modal .add-date-time {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.create-event-modal .add-date-time .time-label {
+  display: none;
+}
+
+.selectors .wrap {
+  width: 100px;
+}
+
+.time-selectors .time-options {
+  position: absolute;
+  z-index: 2;
+  background: white;
+}
+
+.check-allDay .checkbox-span.checked .approved-icon {
+  content: none;
+}
+
+.check-allDay .checkbox-label {
+  justify-content: flex-start;
+  margin-left: 30px;
+  margin-top: 20px;
+}
+
+.wrap-repeat .dropdown {
+  width: 200px;
+  border: transparent;
+  margin-top: 10px;
+  box-shadow: none;
+  border-radius: 0px;
+  justify-content: start;
+  border-bottom: 1px solid #737373;
+}
+
+.wrap-repeat .dropdown .dropdown-icon {
+  position: absolute;
+  top: 220px;
+  left: 350px;
+}
+
+.calendar-icon {
+  width: 16px;
+  height: 16px;
+  background: url(/src/assets/imgs/calendar-icon.png);
+  margin-left: 5px;
+  margin-top: 30px;
+}
+
+.add-cal-dropdown {
+  display: flex;
+  flex-direction: row;
+}
+
+.cal-title-dropdown {
+  width: 450px;
+  margin-left: 10px;
+  border: transparent;
+  margin-top: -10px;
+  box-shadow: none;
+  border-radius: 0px;
+  justify-content: start;
+  border-bottom: 1px solid #737373;
+}
+
+.cal-title-dropdown .dropdown {
+  width: 450px;
+  border: none;
+  box-shadow: none;
+  justify-content: flex-start;
+}
+
+.cal-title-dropdown .options {
+  position: absolute;
+  top: 300px;
+  width: 450px;
+}
+
+.cal-title-dropdown .dropdown .dropdown-icon {
+  position: absolute;
+  top: 295px;
+  left: 480px;
+}
+
+.form-textarea {
+  margin-left: 5px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.icon-textarea {
+  width: 16px;
+  height: 16px;
+  background: url(/src/assets/imgs/icon-text.png);
+  margin-top: 30px;
+}
+
+.form-textarea .textarea {
+  max-height: 10px;
+}
+
+.form-textarea .line {
+  height: 1px;
+}
+
+.form-textarea .textarea-wrapper {
+  width: 470px;
+  height: 50px;
+  margin: 0;
+}
+
+.create-event-modal .modal-buttons {
+  margin-right: 40px;
+  margin-top: 20px;
+}
+
+.calendar-option {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.color-icon {
+  width: 16px;
+  height: 16px;
+  background-size: cover;
+  margin-right: 8px;
+  position: static;
+}
+
+.calendar-option:hover {
+  background-color: #f0f0f0;
 }

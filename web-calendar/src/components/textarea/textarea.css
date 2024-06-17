@@ -2,12 +2,10 @@
   position: relative;
   margin-bottom: 30px;
   width: 499px;
-  height: 148px;
 }
 
 .textarea {
   min-width: 456px;
-  min-height: 103px;
   padding: 8px;
   border: none;
   border-radius: 4px;

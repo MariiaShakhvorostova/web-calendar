@@ -7,16 +7,13 @@ import Checkbox from "../checkbox/checkbox";
 import Button from "../button/button";
 import Modal from "../modal/modal";
 
-import { db } from "../../../firebase";
 import {
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  getDocs,
-  setDoc,
-} from "firebase/firestore";
+  fetchCalendars,
+  createCalendar,
+  updateCalendar,
+  deleteCalendar,
+  updateCalendarCheckbox,
+} from "../../assets/api/calendars";
 
 const CalendarList = () => {
   const [calendars, setCalendars] = useState([]);
@@ -30,17 +27,12 @@ const CalendarList = () => {
   });
 
   useEffect(() => {
-    const fetchCalendars = async () => {
-      const calendarCollection = collection(db, "calendars");
-      const calendarSnapshot = await getDocs(calendarCollection);
-      const calendarList = calendarSnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+    const fetchData = async () => {
+      const calendarList = await fetchCalendars();
       setCalendars(calendarList);
     };
 
-    fetchCalendars();
+    fetchData();
   }, []);
 
   const handleEditClick = (calendar) => {
@@ -54,27 +46,24 @@ const CalendarList = () => {
   };
 
   const handleSave = async (updatedCalendar) => {
+    let newCalendar;
     if (updatedCalendar.id) {
-      const calendarDoc = doc(db, "calendars", updatedCalendar.id);
-      await updateDoc(calendarDoc, updatedCalendar);
+      newCalendar = await updateCalendar(updatedCalendar);
     } else {
-      const id = Date.now().toString();
-      const calendarDoc = doc(db, "calendars", id);
-      await setDoc(calendarDoc, { ...updatedCalendar, id });
-      updatedCalendar.id = id;
+      newCalendar = await createCalendar(updatedCalendar);
     }
     setIsEditModalOpen(false);
     setCurrentCalendar({ id: null, title: "", color: "", isChecked: false });
     setCalendars((prevCalendars) => {
       const existingCalendarIndex = prevCalendars.findIndex(
-        (cal) => cal.id === updatedCalendar.id
+        (cal) => cal.id === newCalendar.id
       );
       if (existingCalendarIndex !== -1) {
         const updatedCalendars = [...prevCalendars];
-        updatedCalendars[existingCalendarIndex] = updatedCalendar;
+        updatedCalendars[existingCalendarIndex] = newCalendar;
         return updatedCalendars;
       } else {
-        return [...prevCalendars, updatedCalendar];
+        return [...prevCalendars, newCalendar];
       }
     });
   };
@@ -85,8 +74,7 @@ const CalendarList = () => {
   };
 
   const handleDeleteConfirm = async () => {
-    const calendarDoc = doc(db, "calendars", currentCalendar.id);
-    await deleteDoc(calendarDoc);
+    await deleteCalendar(currentCalendar.id);
     setIsDeleteModalOpen(false);
     setCurrentCalendar({ id: null, title: "", color: "", isChecked: false });
     setCalendars((prevCalendars) =>
@@ -95,8 +83,7 @@ const CalendarList = () => {
   };
 
   const handleCheckboxChange = async (id, isChecked) => {
-    const calendarDoc = doc(db, "calendars", id);
-    await updateDoc(calendarDoc, { isChecked });
+    await updateCalendarCheckbox(id, isChecked);
     setCalendars((prevCalendars) =>
       prevCalendars.map((cal) => (cal.id === id ? { ...cal, isChecked } : cal))
     );
@@ -112,7 +99,6 @@ const CalendarList = () => {
       {calendars.map((calendar) => (
         <div key={calendar.id} className="calendar-item">
           <Checkbox
-            color={calendar.color}
             backgroundImage={`/src/assets/imgs/colors/${calendar.color}.png`}
             isChecked={calendar.isChecked}
             onChange={(isChecked) =>

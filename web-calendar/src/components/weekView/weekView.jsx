@@ -3,17 +3,10 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import "./weekView.css";
-import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-import { db } from "../../../firebase";
+import { fetchEvents, deleteEvent, updateEvent } from "../../assets/api/events";
 import EventInformationModal from "../eventInfModal/eventInfModal";
 
-const WeekView = ({ selectedDate, onDaySelect }) => {
+const WeekView = ({ selectedDate, onDaySelect, events, setEvents }) => {
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const times = Array.from({ length: 24 }, (_, i) => {
     const hour = i < 10 ? "0" + i : i;
@@ -24,23 +17,21 @@ const WeekView = ({ selectedDate, onDaySelect }) => {
   const startOfWeek = new Date(selectedDate);
   startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
 
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const eventsCollectionRef = collection(db, "events");
-      const querySnapshot = await getDocs(eventsCollectionRef);
-      const eventsData = [];
-      querySnapshot.forEach((doc) => {
-        const eventData = doc.data();
-        eventsData.push(eventData);
-      });
-      setEvents(eventsData);
-      setLoading(false);
+    const fetchData = async () => {
+      try {
+        const eventsData = await fetchEvents();
+        setEvents(eventsData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching events:", error.message, error.code);
+        setLoading(false);
+      }
     };
-    fetchEvents();
+    fetchData();
   }, []);
 
   const getWeekDates = () => {
@@ -62,16 +53,25 @@ const WeekView = ({ selectedDate, onDaySelect }) => {
   };
 
   const handleDelete = async (id) => {
-    await deleteDoc(doc(db, "events", id));
-    setEvents(events.filter((event) => event.id !== id));
-    setSelectedEvent(null);
+    try {
+      await deleteEvent(id);
+      setEvents(events.filter((event) => event.id !== id));
+      setSelectedEvent(null);
+    } catch (error) {
+      console.error("Error deleting event:", error.message, error.code);
+    }
   };
 
   const handleEdit = async (id, updatedEvent) => {
-    const eventDoc = doc(db, "events", id);
-    await updateDoc(eventDoc, updatedEvent);
-    setEvents(events.map((event) => (event.id === id ? updatedEvent : event)));
-    setSelectedEvent(null);
+    try {
+      await updateEvent(id, updatedEvent);
+      setEvents(
+        events.map((event) => (event.id === id ? updatedEvent : event))
+      );
+      setSelectedEvent(null);
+    } catch (error) {
+      console.error("Error updating event:", error.message, error.code);
+    }
   };
 
   const closeEventInformationModal = () => {
