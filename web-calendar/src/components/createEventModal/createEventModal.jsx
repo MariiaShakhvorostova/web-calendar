@@ -9,7 +9,7 @@ import Checkbox from "../checkbox/checkbox";
 import DropdownCalendars from "../dropdownCalendars/dropdownCalendars";
 import Textarea from "../textarea/textarea";
 import { db } from "../../../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import "./createEventModal.css";
 
 const DateDropdown = ({ selectedDate, onDateChange }) => {
@@ -63,18 +63,40 @@ const CreateEventModal = ({
   onEventAdded,
   selectedDate,
   calendars,
+  initialEventData = null,
+  onEventUpdated,
 }) => {
-  const [title, setTitle] = useState("");
-  const [eventDate, setEventDate] = useState(selectedDate || new Date());
-  const [selectedStartTime, setSelectedStartTime] = useState("");
-  const [selectedEndTime, setSelectedEndTime] = useState("");
-  const [isAllDay, setIsAllDay] = useState(false);
-  const [repeatOption, setRepeatOption] = useState("Does not repeat");
-  const [selectedCalendar, setSelectedCalendar] = useState({
-    color: "",
-    title: "Choose calendar",
-  });
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(
+    initialEventData ? initialEventData.title : ""
+  );
+  const [eventDate, setEventDate] = useState(
+    initialEventData
+      ? new Date(initialEventData.date)
+      : selectedDate || new Date()
+  );
+  const [selectedStartTime, setSelectedStartTime] = useState(
+    initialEventData ? initialEventData.startTime : ""
+  );
+  const [selectedEndTime, setSelectedEndTime] = useState(
+    initialEventData ? initialEventData.endTime : ""
+  );
+  const [isAllDay, setIsAllDay] = useState(
+    initialEventData ? initialEventData.isAllDay : false
+  );
+  const [repeatOption, setRepeatOption] = useState(
+    initialEventData ? initialEventData.repeat : "Does not repeat"
+  );
+  const [selectedCalendar, setSelectedCalendar] = useState(
+    initialEventData
+      ? {
+          color: initialEventData.calendarIconColor,
+          title: initialEventData.calendar,
+        }
+      : { color: "", title: "Choose calendar" }
+  );
+  const [description, setDescription] = useState(
+    initialEventData ? initialEventData.description : ""
+  );
   const [isStartTimeMenuOpen, setIsStartTimeMenuOpen] = useState(false);
   const [isEndTimeMenuOpen, setIsEndTimeMenuOpen] = useState(false);
   const repeatOptions = [
@@ -94,25 +116,33 @@ const CreateEventModal = ({
   };
 
   const handleSave = async () => {
-    const newEvent = {
-      id: Date.now().toString(),
+    const eventDetails = {
       title,
       date: eventDate.toISOString().split("T")[0],
-      startTime: isAllDay ? "All day" : selectedStartTime,
-      endTime: isAllDay ? "" : selectedEndTime,
+      startTime: selectedStartTime,
+      endTime: selectedEndTime,
       repeat: repeatOption,
       calendar: selectedCalendar.title,
+      calendarIconColor: selectedCalendar.color,
       description,
+      isAllDay,
     };
+
     try {
-      const eventsCollectionRef = collection(db, "events");
-      await addDoc(eventsCollectionRef, newEvent);
-      console.log("New event added to Firebase:", newEvent);
-      onEventAdded(newEvent);
+      if (initialEventData) {
+        await updateDoc(doc(db, "events", initialEventData.id), eventDetails);
+        console.log("Event updated in Firebase:", eventDetails);
+        onEventUpdated({ ...eventDetails, id: initialEventData.id });
+      } else {
+        const eventsCollectionRef = collection(db, "events");
+        const docRef = await addDoc(eventsCollectionRef, eventDetails);
+        console.log("New event added to Firebase:", eventDetails);
+        onEventAdded({ ...eventDetails, id: docRef.id });
+      }
       onClose();
     } catch (error) {
-      console.error("Error adding event to Firebase:", error.message);
-      alert(`Error adding event: ${error.message}`);
+      console.error("Error saving event to Firebase:", error.message);
+      alert(`Error saving event: ${error.message}`);
     }
   };
 
@@ -126,7 +156,7 @@ const CreateEventModal = ({
     <div className="modal-background" onClick={handleBackgroundClick}>
       <div className="create-event-modal" onClick={handleModalClick}>
         <div className="modal-header">
-          <h2>Create event</h2>
+          <h2>{initialEventData ? "Edit event" : "Create event"}</h2>
           <button className="close-button" onClick={onClose}></button>
         </div>
         <div className="create-line"></div>
@@ -170,7 +200,7 @@ const CreateEventModal = ({
                   isMenuOpen={isEndTimeMenuOpen}
                   toggleMenu={() => setIsEndTimeMenuOpen(!isEndTimeMenuOpen)}
                   placeholder="End Time"
-                />{" "}
+                />
               </div>
             </div>
           </div>

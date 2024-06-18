@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import "./dayView.css";
-import { fetchEvents, deleteEvent, updateEvent } from "../../assets/api/events";
+import { fetchEvents, deleteEvent, updateEvent } from "../../api/events";
 import EventInformationModal from "../eventInfModal/eventInfModal";
 
 const DayView = ({ selectedDate, events, setEvents }) => {

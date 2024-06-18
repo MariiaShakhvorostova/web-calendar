@@ -6,9 +6,8 @@ import Datepicker from "./components/datepicker/date";
 import CalendarList from "./components/calendarList/calendarList";
 import CentralCalendar from "./components/centralCalendar/centralCalendar";
 import CreateEventModal from "./components/createEventModal/createEventModal";
-import { fetchCalendars } from "./assets/api/calendars";
-
 import "./App.css";
+import { fetchCalendars } from "./api/calendars";
 
 function App() {
   const [calendars, setCalendars] = useState([]);
@@ -16,13 +15,13 @@ function App() {
   const [selectedView, setSelectedView] = useState("Week");
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const calendarList = await fetchCalendars();
       setCalendars(calendarList);
     };
-
     fetchData();
   }, []);
 
@@ -53,21 +52,33 @@ function App() {
   };
 
   const handleCreateEventModalOpen = () => {
+    setSelectedEvent(null);
     setIsCreateEventModalOpen(true);
   };
 
   const handleEventAdded = (newEvent) => {
     setEvents((prevEvents) => [...prevEvents, newEvent]);
+    setIsCreateEventModalOpen(false);
   };
 
-  const handleEventsChange = (newEvents) => {
-    setEvents(newEvents);
+  const handleEventUpdated = (updatedEvent) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((event) =>
+        event.id === updatedEvent.id ? updatedEvent : event
+      )
+    );
+    setIsCreateEventModalOpen(false);
+  };
+
+  const handleEventEdit = (event) => {
+    setSelectedEvent(event);
+    setIsCreateEventModalOpen(true);
   };
 
   return (
     <>
       <Header selectedView={selectedView} onViewChange={handleViewChange} />
-      <button className="button-container">
+      <div className="button-container">
         <Button
           type={"longer"}
           disabled={false}
@@ -75,7 +86,7 @@ function App() {
         >
           Create
         </Button>
-      </button>
+      </div>
       <Datepicker value={selectedDate} onChange={handleDateChange} />
       <CalendarList
         calendars={calendars}
@@ -88,12 +99,15 @@ function App() {
         view={selectedView}
         events={events}
         setEvents={setEvents}
+        onEventEdit={handleEventEdit}
       />
       {isCreateEventModalOpen && (
         <CreateEventModal
           selectedDate={selectedDate}
           onClose={() => setIsCreateEventModalOpen(false)}
           onEventAdded={handleEventAdded}
+          onEventUpdated={handleEventUpdated}
+          initialEventData={selectedEvent}
           calendars={calendars}
         />
       )}

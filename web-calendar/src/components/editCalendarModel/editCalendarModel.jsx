@@ -42,11 +42,11 @@ const EditCalendarModal = ({ calendar, onSave, onClose }) => {
           <div className="form-group">
             <ColorPicker value={color} onColorSelect={setColor} />
 
-            <button className="save-button">
+            <div className="save-button">
               <Button type="primary" onClick={handleSave}>
                 Save
               </Button>
-            </button>
+            </div>
           </div>
         </div>
       </div>

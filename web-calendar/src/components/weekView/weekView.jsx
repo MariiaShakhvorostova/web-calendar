@@ -1,12 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import "./weekView.css";
-import { fetchEvents, deleteEvent, updateEvent } from "../../assets/api/events";
+import { fetchEvents, deleteEvent } from "../../api/events";
 import EventInformationModal from "../eventInfModal/eventInfModal";
 
-const WeekView = ({ selectedDate, onDaySelect, events, setEvents }) => {
+const WeekView = ({
+  selectedDate,
+  onDaySelect,
+  events,
+  setEvents,
+  onEventEdit,
+}) => {
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const times = Array.from({ length: 24 }, (_, i) => {
     const hour = i < 10 ? "0" + i : i;
@@ -59,18 +66,6 @@ const WeekView = ({ selectedDate, onDaySelect, events, setEvents }) => {
       setSelectedEvent(null);
     } catch (error) {
       console.error("Error deleting event:", error.message, error.code);
-    }
-  };
-
-  const handleEdit = async (id, updatedEvent) => {
-    try {
-      await updateEvent(id, updatedEvent);
-      setEvents(
-        events.map((event) => (event.id === id ? updatedEvent : event))
-      );
-      setSelectedEvent(null);
-    } catch (error) {
-      console.error("Error updating event:", error.message, error.code);
     }
   };
 
@@ -150,7 +145,7 @@ const WeekView = ({ selectedDate, onDaySelect, events, setEvents }) => {
         <EventInformationModal
           event={selectedEvent}
           onClose={closeEventInformationModal}
-          onEdit={handleEdit}
+          onEdit={() => onEventEdit(selectedEvent)}
           onDelete={handleDelete}
         />
       )}

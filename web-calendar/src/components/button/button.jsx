@@ -18,10 +18,10 @@ const Button = ({ type, disabled, onClick, children }) => {
   });
 
   return (
-    <div className={buttonClass} onClick={onClick}>
+    <button className={buttonClass} onClick={onClick} disabled={disabled}>
       {iconClass && <div className={iconClass}></div>}
       {children}
-    </div>
+    </button>
   );
 };
 

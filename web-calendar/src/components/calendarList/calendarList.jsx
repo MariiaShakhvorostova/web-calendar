@@ -13,7 +13,7 @@ import {
   updateCalendar,
   deleteCalendar,
   updateCalendarCheckbox,
-} from "../../assets/api/calendars";
+} from "../../api/calendars";
 
 const CalendarList = () => {
   const [calendars, setCalendars] = useState([]);

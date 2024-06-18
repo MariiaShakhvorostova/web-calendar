@@ -100,7 +100,6 @@
 .color-icon-container {
   display: flex;
   justify-content: center;
-  gap: 45px;
 }
 
 .title-icon {

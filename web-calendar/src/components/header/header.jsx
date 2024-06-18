@@ -7,7 +7,6 @@ import "./header.css";
 
 const Header = ({ selectedView, onViewChange }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedOption, setSelectedOption] = useState("Week");
 
   useEffect(() => {
     const today = new Date();
