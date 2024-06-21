@@ -53,8 +53,24 @@
 
 .day-view .event {
   background-color: rgba(0, 123, 255, 0.3);
-  border: 1px solid #007bff;
   box-sizing: border-box;
   padding: 2px;
   margin: 2px 0;
+}
+
+.day-view .day-line {
+  height: 100%;
+  position: absolute;
+  left: -1px;
+}
+
+.day-view td {
+  padding: 0;
+}
+
+.day-view .event-cell .event {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
 }

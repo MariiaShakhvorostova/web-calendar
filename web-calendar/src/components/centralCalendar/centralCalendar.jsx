@@ -5,7 +5,14 @@ import DayView from "../dayView/dayView";
 import WeekView from "../weekView/weekView";
 import "./cenralCalendal.css";
 
-const CentralCalendar = ({ date, view, events, setEvents, onEventEdit }) => {
+const CentralCalendar = ({
+  date,
+  view,
+  events,
+  setEvents,
+  onEventEdit,
+  selectedCalendarId,
+}) => {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [selectedDayOfWeek, setSelectedDayOfWeek] = useState("");
 
@@ -19,7 +26,13 @@ const CentralCalendar = ({ date, view, events, setEvents, onEventEdit }) => {
   return (
     <div className="central-calendar">
       {view === "Day" ? (
-        <DayView selectedDate={date} events={events} setEvents={setEvents} />
+        <DayView
+          selectedDate={date}
+          events={events}
+          setEvents={setEvents}
+          onEventEdit={onEventEdit}
+          selectedCalendarId={selectedCalendarId}
+        />
       ) : (
         <WeekView
           selectedDate={date}
@@ -27,6 +40,7 @@ const CentralCalendar = ({ date, view, events, setEvents, onEventEdit }) => {
           events={events}
           setEvents={setEvents}
           onEventEdit={onEventEdit}
+          selectedCalendarId={selectedCalendarId}
         />
       )}
     </div>

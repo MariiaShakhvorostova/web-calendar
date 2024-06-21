@@ -1,17 +1,21 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Button from "../button/button";
 import Dropdown from "../dropdown/dropdown";
 import "./header.css";
 
-const Header = ({ selectedView, onViewChange }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
+const Header = ({
+  selectedDate,
+  setSelectedDate,
+  selectedView,
+  onViewChange,
+  onTodayClick,
+}) => {
   useEffect(() => {
     const today = new Date();
     setSelectedDate(today);
-  }, []);
+  }, [setSelectedDate]);
 
   const changeMonth = (increment) => {
     setSelectedDate((prevDate) => {
@@ -32,7 +36,7 @@ const Header = ({ selectedView, onViewChange }) => {
       <div className="header-content">
         <div className="group__1">
           <div className="logo"></div>
-          <Button disabled={false} type="default">
+          <Button disabled={false} type="default" onClick={onTodayClick}>
             Today
           </Button>
           <div className="nav">

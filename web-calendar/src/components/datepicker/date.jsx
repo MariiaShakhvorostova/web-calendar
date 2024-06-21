@@ -4,37 +4,25 @@ import React, { useState, useEffect } from "react";
 import "./date.css";
 
 const Datepicker = ({ value, onChange }) => {
-  const [selectedDate, setSelectedDate] = useState(value || new Date());
   const [clickedDay, setClickedDay] = useState(null);
 
   useEffect(() => {
-    const today = new Date();
-    setSelectedDate(today);
-    setClickedDay(today.getDate());
-  }, []);
+    if (value) {
+      setClickedDay(value.getDate());
+    }
+  }, [value]);
 
   const changeMonth = (increment) => {
-    setSelectedDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setMonth(newDate.getMonth() + increment);
-      setClickedDay(null);
-      return newDate;
-    });
+    onChange(new Date(value.setMonth(value.getMonth() + increment)));
+    setClickedDay(null);
   };
 
   const handleDayClick = (day, className) => {
     if (className === "current-month") {
-      setSelectedDate((prevDate) => {
-        const newDate = new Date(prevDate);
-        newDate.setDate(day);
-        setClickedDay(day);
-
-        setTimeout(() => {
-          onChange(newDate);
-        }, 0);
-
-        return newDate;
-      });
+      const newDate = new Date(value);
+      newDate.setDate(day);
+      setClickedDay(day);
+      onChange(newDate);
     } else if (className === "previous-month") {
       changeMonth(-1);
     } else if (className === "next-month") {
@@ -48,8 +36,8 @@ const Datepicker = ({ value, onChange }) => {
   };
 
   const getMonthDays = () => {
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth();
+    const year = value.getFullYear();
+    const month = value.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfWeek = new Date(year, month, 1).getDay();
     let days = [];
@@ -72,7 +60,7 @@ const Datepicker = ({ value, onChange }) => {
       <div
         key={index}
         className={`day ${item.className}${
-          item.day === selectedDate.getDate() &&
+          item.day === value.getDate() &&
           item.className === "current-month" &&
           item.day === clickedDay
             ? " selected"
@@ -89,7 +77,7 @@ const Datepicker = ({ value, onChange }) => {
     <div className="datepicker">
       <div className="month-controls">
         <div className="current-month">
-          {selectedDate.toLocaleString("en-US", {
+          {value.toLocaleString("en-US", {
             month: "long",
             year: "numeric",
           })}

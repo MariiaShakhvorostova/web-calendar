@@ -15,7 +15,7 @@ import {
   updateCalendarCheckbox,
 } from "../../api/calendars";
 
-const CalendarList = () => {
+const CalendarList = ({ onCalendarSelect }) => {
   const [calendars, setCalendars] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -89,15 +89,23 @@ const CalendarList = () => {
     );
   };
 
+  const handleCalendarClick = (calendar) => {
+    console.log("Clicked calendar:", calendar);
+    onCalendarSelect(calendar);
+  };
+
   return (
     <div className="calendar-list">
       <div className="h2-button">
         <h2>My calendars</h2>
         <button className="add-button" onClick={handleAddClick}></button>
       </div>
-
       {calendars.map((calendar) => (
-        <div key={calendar.id} className="calendar-item">
+        <div
+          key={calendar.id}
+          className="calendar-item"
+          onClick={() => handleCalendarClick(calendar)}
+        >
           <Checkbox
             backgroundImage={`/src/assets/imgs/colors/${calendar.color}.png`}
             isChecked={calendar.isChecked}
@@ -124,7 +132,6 @@ const CalendarList = () => {
           </div>
         </div>
       ))}
-
       {isEditModalOpen && (
         <EditCalendarModal
           calendar={currentCalendar}
@@ -132,7 +139,6 @@ const CalendarList = () => {
           onClose={() => setIsEditModalOpen(false)}
         />
       )}
-
       {isDeleteModalOpen && (
         <Modal
           title="Delete calendar"

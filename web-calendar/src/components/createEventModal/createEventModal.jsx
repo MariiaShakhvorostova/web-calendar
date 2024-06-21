@@ -89,6 +89,7 @@ const CreateEventModal = ({
   const [selectedCalendar, setSelectedCalendar] = useState(
     initialEventData
       ? {
+          id: initialEventData.calendarId,
           color: initialEventData.calendarIconColor,
           title: initialEventData.calendar,
         }
@@ -108,6 +109,7 @@ const CreateEventModal = ({
   ];
 
   const [timeSelectorIsOpen, setTimeSelectorIsOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleModalClick = () => {
     if (timeSelectorIsOpen) {
@@ -116,6 +118,23 @@ const CreateEventModal = ({
   };
 
   const handleSave = async () => {
+    if (!title.trim()) {
+      setErrorMessage("Title is required");
+      return;
+    }
+    if (!eventDate) {
+      setErrorMessage("Date is required");
+      return;
+    }
+    if (!selectedStartTime || !selectedEndTime) {
+      setErrorMessage("Start time and End time are required");
+      return;
+    }
+    if (selectedCalendar.title === "Choose calendar") {
+      setErrorMessage("Please select a calendar");
+      return;
+    }
+
     const eventDetails = {
       title,
       date: eventDate.toISOString().split("T")[0],
@@ -124,6 +143,7 @@ const CreateEventModal = ({
       repeat: repeatOption,
       calendar: selectedCalendar.title,
       calendarIconColor: selectedCalendar.color,
+      calendarId: selectedCalendar.id,
       description,
       isAllDay,
     };
@@ -244,6 +264,7 @@ const CreateEventModal = ({
           <div className="modal-buttons">
             <Button onClick={handleSave}>Save</Button>
           </div>
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
         </div>
       </div>
     </div>

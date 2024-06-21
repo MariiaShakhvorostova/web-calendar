@@ -286,3 +286,12 @@
 .calendar-option:hover {
   background-color: #f0f0f0;
 }
+
+.error-message {
+  position: absolute;
+  top: 450px;
+  color: crimson;
+  font-family: inter;
+  font-size: 15px;
+  margin-left: 10px;
+}

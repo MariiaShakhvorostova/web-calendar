@@ -37,15 +37,14 @@
 
 .week-view .event {
   position: absolute;
-  width: 100%;
+  width: 95%;
   height: calc(100% - 2px);
-  background-color: rgba(0, 123, 255, 0.3);
-  border: 1px solid #007bff;
   box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding: 2px;
+  top: 0px;
+  left: 0px;
   border-radius: 4px;
 }
 
@@ -81,4 +80,14 @@
   padding: 0;
   border: none;
   box-shadow: 0px 1px 2px 0px #dedfe5;
+}
+
+.vertical-line {
+  width: 4px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100%;
+  position: absolute;
+  background-position: center center;
+  top: -0px;
 }

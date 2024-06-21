@@ -16,6 +16,7 @@ function App() {
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedCalendarId, setSelectedCalendarId] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +52,12 @@ function App() {
     setSelectedView(newView);
   };
 
+  const handleTodayClick = () => {
+    const today = new Date();
+    setSelectedDate(today);
+    setSelectedView("Day");
+  };
+
   const handleCreateEventModalOpen = () => {
     setSelectedEvent(null);
     setIsCreateEventModalOpen(true);
@@ -75,9 +82,27 @@ function App() {
     setIsCreateEventModalOpen(true);
   };
 
+  const handleCalendarSelect = (calendar) => {
+    setSelectedCalendarId(calendar.id);
+    const filteredEvents = events.filter(
+      (event) => event.calendarId === calendar.id
+    );
+    console.log("Filtered events:", filteredEvents);
+  };
+
+  const filteredEvents = selectedCalendarId
+    ? events.filter((event) => event.calendarId === selectedCalendarId)
+    : events;
+
   return (
     <>
-      <Header selectedView={selectedView} onViewChange={handleViewChange} />
+      <Header
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        selectedView={selectedView}
+        onViewChange={handleViewChange}
+        onTodayClick={handleTodayClick}
+      />
       <div className="button-container">
         <Button
           type={"longer"}
@@ -93,13 +118,15 @@ function App() {
         onEdit={handleEditCalendar}
         onDelete={handleDeleteCalendar}
         onAdd={handleAddCalendar}
+        onCalendarSelect={handleCalendarSelect}
       />
       <CentralCalendar
         date={selectedDate}
         view={selectedView}
-        events={events}
+        events={filteredEvents}
         setEvents={setEvents}
         onEventEdit={handleEventEdit}
+        selectedCalendarId={selectedCalendarId}
       />
       {isCreateEventModalOpen && (
         <CreateEventModal
