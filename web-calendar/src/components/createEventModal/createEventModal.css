@@ -128,8 +128,8 @@
   background: url(/src/assets/imgs/titleT-icon.png);
   width: 16px;
   position: absolute;
-  top: 97px;
-  left: 25px;
+  top: 33px;
+  left: 5px;
   height: 16px;
 }
 
@@ -188,8 +188,8 @@
 
 .wrap-repeat .dropdown .dropdown-icon {
   position: absolute;
-  top: 220px;
-  left: 350px;
+  top: 23px;
+  left: 329px;
 }
 
 .calendar-icon {
@@ -287,11 +287,35 @@
   background-color: #f0f0f0;
 }
 
+.form-create-group {
+  position: relative;
+  margin-bottom: 15px;
+}
+
 .error-message {
   position: absolute;
-  top: 450px;
+  top: 100%;
+  left: 0;
   color: crimson;
-  font-family: inter;
+  font-family: Inter, sans-serif;
   font-size: 15px;
-  margin-left: 10px;
+}
+
+.form-create-group .error-message-visible {
+  visibility: visible;
+}
+
+.err-start {
+  margin-left: 30px;
+  left: 98px;
+}
+
+.err-end {
+  margin-right: 30px;
+  right: 93px;
+}
+
+.err-calendar,
+.err-title {
+  margin-left: 30px;
 }

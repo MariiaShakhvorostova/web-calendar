@@ -24,7 +24,7 @@ const EventInformationModal = ({ event, onClose, onEdit, onDelete }) => {
       dateOptions
     );
 
-    const timeString = event.isAllDay ? "All day" : null;
+    const timeString = event.isAllDay ? "All day" : "";
 
     return `${formattedDate}, ${event.startTime} - ${event.endTime}, ${timeString}`;
   };
