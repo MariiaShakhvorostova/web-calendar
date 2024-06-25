@@ -8,6 +8,7 @@ import CentralCalendar from "./components/centralCalendar/centralCalendar";
 import CreateEventModal from "./components/createEventModal/createEventModal";
 import "./App.css";
 import { fetchCalendars } from "./api/calendars";
+import { fetchEvents } from "./api/events";
 
 function App() {
   const [calendars, setCalendars] = useState([]);
@@ -22,6 +23,8 @@ function App() {
     const fetchData = async () => {
       const calendarList = await fetchCalendars();
       setCalendars(calendarList);
+      const eventsData = await fetchEvents();
+      setEvents(eventsData);
     };
     fetchData();
   }, []);
@@ -37,6 +40,9 @@ function App() {
   const handleDeleteCalendar = (calendarId) => {
     setCalendars((prevCalendars) =>
       prevCalendars.filter((calendar) => calendar.id !== calendarId)
+    );
+    setEvents((prevEvents) =>
+      prevEvents.filter((event) => event.calendarId !== calendarId)
     );
   };
 
@@ -84,10 +90,6 @@ function App() {
 
   const handleCalendarSelect = (calendar) => {
     setSelectedCalendarId(calendar.id);
-    const filteredEvents = events.filter(
-      (event) => event.calendarId === calendar.id
-    );
-    console.log("Filtered events:", filteredEvents);
   };
 
   const filteredEvents = selectedCalendarId
@@ -119,6 +121,7 @@ function App() {
         onDelete={handleDeleteCalendar}
         onAdd={handleAddCalendar}
         onCalendarSelect={handleCalendarSelect}
+        setEvents={setEvents}
       />
       <CentralCalendar
         date={selectedDate}

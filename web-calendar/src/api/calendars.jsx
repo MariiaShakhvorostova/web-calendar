@@ -6,6 +6,9 @@ import {
   doc,
   getDocs,
   setDoc,
+  query,
+  where,
+  writeBatch,
 } from "firebase/firestore";
 
 export const fetchCalendars = async () => {
@@ -26,6 +29,18 @@ export const createCalendar = async (calendar) => {
 
 export const deleteCalendar = async (id) => {
   const calendarDoc = doc(db, "calendars", id);
+
+  const eventsQuery = query(
+    collection(db, "events"),
+    where("calendarId", "==", id)
+  );
+  const eventsSnapshot = await getDocs(eventsQuery);
+  const batch = writeBatch(db);
+  eventsSnapshot.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+  await batch.commit();
+
   await deleteDoc(calendarDoc);
 };
 

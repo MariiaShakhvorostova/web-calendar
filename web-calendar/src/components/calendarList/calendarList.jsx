@@ -15,7 +15,7 @@ import {
   updateCalendarCheckbox,
 } from "../../api/calendars";
 
-const CalendarList = ({ onCalendarSelect }) => {
+const CalendarList = ({ onCalendarSelect, setEvents }) => {
   const [calendars, setCalendars] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -80,6 +80,10 @@ const CalendarList = ({ onCalendarSelect }) => {
     setCalendars((prevCalendars) =>
       prevCalendars.filter((cal) => cal.id !== currentCalendar.id)
     );
+
+    setEvents((prevEvents) =>
+      prevEvents.filter((event) => event.calendarId !== currentCalendar.id)
+    );
   };
 
   const handleCheckboxChange = async (id, isChecked) => {
@@ -90,7 +94,6 @@ const CalendarList = ({ onCalendarSelect }) => {
   };
 
   const handleCalendarClick = (calendar) => {
-    console.log("Clicked calendar:", calendar);
     onCalendarSelect(calendar);
   };
 
@@ -109,8 +112,8 @@ const CalendarList = ({ onCalendarSelect }) => {
           <Checkbox
             backgroundImage={`/src/assets/imgs/colors/${calendar.color}.png`}
             isChecked={calendar.isChecked}
-            onChange={(isChecked) =>
-              handleCheckboxChange(calendar.id, isChecked)
+            onChange={(isChecked, event) =>
+              handleCheckboxChange(calendar.id, isChecked, event)
             }
           />
           <span>{calendar.title}</span>
@@ -120,13 +123,19 @@ const CalendarList = ({ onCalendarSelect }) => {
                 src="/src/assets/imgs/delete.png"
                 alt="Delete"
                 className="delete-icon"
-                onClick={() => handleDeleteClick(calendar)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleDeleteClick(calendar);
+                }}
               />
               <img
                 src="/src/assets/imgs/Iconedit-pen.png"
                 alt="Edit"
                 className="edit-icon"
-                onClick={() => handleEditClick(calendar)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleEditClick(calendar);
+                }}
               />
             </div>
           </div>
