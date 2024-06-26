@@ -91,10 +91,7 @@ const CalendarList = ({ onCalendarSelect, setEvents }) => {
     setCalendars((prevCalendars) =>
       prevCalendars.map((cal) => (cal.id === id ? { ...cal, isChecked } : cal))
     );
-  };
-
-  const handleCalendarClick = (calendar) => {
-    onCalendarSelect(calendar);
+    onCalendarSelect({ id, isChecked });
   };
 
   return (
@@ -104,11 +101,7 @@ const CalendarList = ({ onCalendarSelect, setEvents }) => {
         <button className="add-button" onClick={handleAddClick}></button>
       </div>
       {calendars.map((calendar) => (
-        <div
-          key={calendar.id}
-          className="calendar-item"
-          onClick={() => handleCalendarClick(calendar)}
-        >
+        <div key={calendar.id} className="calendar-item">
           <Checkbox
             backgroundImage={`/src/assets/imgs/colors/${calendar.color}.png`}
             isChecked={calendar.isChecked}

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import Header from "./components/header/header";
 import Button from "./components/button/button";
@@ -17,7 +16,7 @@ function App() {
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedCalendarId, setSelectedCalendarId] = useState(null);
+  const [selectedCalendarIds, setSelectedCalendarIds] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,13 +87,18 @@ function App() {
     setIsCreateEventModalOpen(true);
   };
 
-  const handleCalendarSelect = (calendar) => {
-    setSelectedCalendarId(calendar.id);
+  const handleCalendarSelect = ({ id, isChecked }) => {
+    setSelectedCalendarIds((prevSelected) =>
+      isChecked
+        ? [...prevSelected, id]
+        : prevSelected.filter((calendarId) => calendarId !== id)
+    );
   };
 
-  const filteredEvents = selectedCalendarId
-    ? events.filter((event) => event.calendarId === selectedCalendarId)
-    : events;
+  const filteredEvents =
+    selectedCalendarIds.length > 0
+      ? events.filter((event) => selectedCalendarIds.includes(event.calendarId))
+      : events;
 
   return (
     <>
@@ -129,7 +133,7 @@ function App() {
         events={filteredEvents}
         setEvents={setEvents}
         onEventEdit={handleEventEdit}
-        selectedCalendarId={selectedCalendarId}
+        selectedCalendarIds={selectedCalendarIds}
       />
       {isCreateEventModalOpen && (
         <CreateEventModal
