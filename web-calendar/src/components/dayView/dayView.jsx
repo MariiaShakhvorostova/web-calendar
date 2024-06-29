@@ -10,7 +10,7 @@ const DayView = ({
   events,
   setEvents,
   onEventEdit,
-  selectedCalendarId,
+  selectedCalendarIds,
 }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -32,8 +32,8 @@ const DayView = ({
     fetchData();
   }, [selectedDate, setEvents]);
 
-  const filteredEvents = selectedCalendarId
-    ? events.filter((event) => event.calendarId === selectedCalendarId)
+  const filteredEvents = selectedCalendarIds
+    ? events.filter((event) => selectedCalendarIds.includes(event.calendarId))
     : events;
 
   const handleEventClick = (event) => {

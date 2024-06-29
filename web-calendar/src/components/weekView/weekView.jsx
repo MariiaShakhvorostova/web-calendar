@@ -13,7 +13,7 @@ const WeekView = ({
   events,
   setEvents,
   onEventEdit,
-  selectedCalendarId,
+  selectedCalendarIds,
 }) => {
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const times = Array.from({ length: 24 }, (_, i) => {
@@ -44,11 +44,11 @@ const WeekView = ({
   }, []);
 
   useEffect(() => {
-    const filteredEvents = selectedCalendarId
-      ? events.filter((event) => event.calendarId === selectedCalendarId)
-      : events;
+    const filteredEvents = events.filter((event) =>
+      selectedCalendarIds.includes(event.calendarId)
+    );
     setWeekEvents(filteredEvents);
-  }, [events, selectedCalendarId]);
+  }, [events, selectedCalendarIds]);
 
   const getWeekDates = () => {
     return weekDays.map((_, index) => {

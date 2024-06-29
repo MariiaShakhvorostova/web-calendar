@@ -22,11 +22,34 @@ function App() {
     const fetchData = async () => {
       const calendarList = await fetchCalendars();
       setCalendars(calendarList);
-      const eventsData = await fetchEvents();
-      setEvents(eventsData);
+
+      const checkedCalendarIds = calendarList
+        .filter((calendar) => calendar.isChecked)
+        .map((calendar) => calendar.id);
+      setSelectedCalendarIds(checkedCalendarIds);
+
+      if (checkedCalendarIds.length > 0) {
+        const eventsData = await fetchEvents();
+        setEvents(eventsData);
+      }
     };
     fetchData();
   }, []);
+
+  const handleCalendarSelect = async ({ id, isChecked }) => {
+    const updatedSelectedCalendarIds = isChecked
+      ? [...selectedCalendarIds, id]
+      : selectedCalendarIds.filter((calendarId) => calendarId !== id);
+
+    setSelectedCalendarIds(updatedSelectedCalendarIds);
+
+    const newEvents = await fetchEvents();
+    setEvents(
+      newEvents.filter((event) =>
+        updatedSelectedCalendarIds.includes(event.calendarId)
+      )
+    );
+  };
 
   const handleEditCalendar = (updatedCalendar) => {
     setCalendars((prevCalendars) =>
@@ -87,19 +110,6 @@ function App() {
     setIsCreateEventModalOpen(true);
   };
 
-  const handleCalendarSelect = ({ id, isChecked }) => {
-    setSelectedCalendarIds((prevSelected) =>
-      isChecked
-        ? [...prevSelected, id]
-        : prevSelected.filter((calendarId) => calendarId !== id)
-    );
-  };
-
-  const filteredEvents =
-    selectedCalendarIds.length > 0
-      ? events.filter((event) => selectedCalendarIds.includes(event.calendarId))
-      : events;
-
   return (
     <>
       <Header
@@ -126,11 +136,12 @@ function App() {
         onAdd={handleAddCalendar}
         onCalendarSelect={handleCalendarSelect}
         setEvents={setEvents}
+        selectedCalendarIds={selectedCalendarIds}
       />
       <CentralCalendar
         date={selectedDate}
         view={selectedView}
-        events={filteredEvents}
+        events={events}
         setEvents={setEvents}
         onEventEdit={handleEventEdit}
         selectedCalendarIds={selectedCalendarIds}

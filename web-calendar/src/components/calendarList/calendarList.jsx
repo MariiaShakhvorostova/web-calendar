@@ -15,7 +15,7 @@ import {
   updateCalendarCheckbox,
 } from "../../api/calendars";
 
-const CalendarList = ({ onCalendarSelect, setEvents }) => {
+const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
   const [calendars, setCalendars] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -92,6 +92,16 @@ const CalendarList = ({ onCalendarSelect, setEvents }) => {
       prevCalendars.map((cal) => (cal.id === id ? { ...cal, isChecked } : cal))
     );
     onCalendarSelect({ id, isChecked });
+
+    const updatedSelectedCalendarIds = isChecked
+      ? [...selectedCalendarIds, id]
+      : selectedCalendarIds.filter((calendarId) => calendarId !== id);
+
+    setEvents((prevEvents) =>
+      prevEvents.filter((event) =>
+        updatedSelectedCalendarIds.includes(event.calendarId)
+      )
+    );
   };
 
   return (

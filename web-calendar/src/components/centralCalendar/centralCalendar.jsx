@@ -11,7 +11,7 @@ const CentralCalendar = ({
   events,
   setEvents,
   onEventEdit,
-  selectedCalendarId,
+  selectedCalendarIds,
 }) => {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [selectedDayOfWeek, setSelectedDayOfWeek] = useState("");
@@ -31,7 +31,7 @@ const CentralCalendar = ({
           events={events}
           setEvents={setEvents}
           onEventEdit={onEventEdit}
-          selectedCalendarId={selectedCalendarId}
+          selectedCalendarIds={selectedCalendarIds}
         />
       ) : (
         <WeekView
@@ -40,7 +40,7 @@ const CentralCalendar = ({
           events={events}
           setEvents={setEvents}
           onEventEdit={onEventEdit}
-          selectedCalendarId={selectedCalendarId}
+          selectedCalendarIds={selectedCalendarIds}
         />
       )}
     </div>
