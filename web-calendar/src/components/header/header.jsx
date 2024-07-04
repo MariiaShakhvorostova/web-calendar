@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../button/button";
 import Dropdown from "../dropdown/dropdown";
 import "./header.css";
@@ -12,10 +13,30 @@ const Header = ({
   onViewChange,
   onTodayClick,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [showExit, setShowExit] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/welcome");
+  };
+
   useEffect(() => {
-    const today = new Date();
-    setSelectedDate(today);
+    setSelectedDate(new Date());
   }, [setSelectedDate]);
+
+  useEffect(() => {
+    let timer;
+    if (isHovered) {
+      setShowExit(true);
+      clearTimeout(timer);
+    } else {
+      timer = setTimeout(() => {
+        setShowExit(false);
+      }, 3000);
+    }
+    return () => clearTimeout(timer);
+  }, [isHovered]);
 
   const changeMonth = (increment) => {
     setSelectedDate((prevDate) => {
@@ -62,9 +83,22 @@ const Header = ({
             options={["Day", "Week"]}
             onOptionChange={handleOptionChange}
           />
-          <div className="user-info">
+          <div
+            className="user-info"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             <span>Username</span>
             <div className="user-avatar"></div>
+          </div>
+          <div className="button-exit">
+            <div className={`icon-exit ${showExit ? "visible" : ""}`}></div>
+            <button
+              className={`log-out ${showExit ? "visible" : ""}`}
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
