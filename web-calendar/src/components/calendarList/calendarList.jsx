@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import EditCalendarModal from "../editCalendarModel/editCalendarModel";
 import "./calendarList.css";
@@ -30,6 +28,18 @@ const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
     const fetchData = async () => {
       const calendarList = await fetchCalendars();
       setCalendars(calendarList);
+
+      const defaultCalendar = calendarList.find(
+        (cal) => cal.title === "Default"
+      );
+      if (!defaultCalendar) {
+        const newDefaultCalendar = await createCalendar({
+          title: "Default",
+          color: "bright-pink",
+          isChecked: true,
+        });
+        setCalendars((prevCalendars) => [...prevCalendars, newDefaultCalendar]);
+      }
     };
 
     fetchData();
@@ -41,6 +51,9 @@ const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
   };
 
   const handleDeleteClick = (calendar) => {
+    if (calendar.title === "Default") {
+      return;
+    }
     setCurrentCalendar(calendar);
     setIsDeleteModalOpen(true);
   };
@@ -74,6 +87,9 @@ const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
   };
 
   const handleDeleteConfirm = async () => {
+    if (currentCalendar.title === "Default") {
+      return;
+    }
     await deleteCalendar(currentCalendar.id);
     setIsDeleteModalOpen(false);
     setCurrentCalendar({ id: null, title: "", color: "", isChecked: false });

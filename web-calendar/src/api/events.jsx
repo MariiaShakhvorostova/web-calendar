@@ -9,10 +9,28 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+import { calculateRepeatDates } from "./dateUtils";
+
 export const createEvent = async (eventData) => {
   try {
     const eventsCollectionRef = collection(db, "events");
+
     const newEventRef = await addDoc(eventsCollectionRef, eventData);
+
+    if (eventData.repeat === "Does not repeat") {
+      return newEventRef.id;
+    }
+
+    const repeatDates = calculateRepeatDates(eventData.date, eventData.repeat);
+
+    for (const date of repeatDates) {
+      const repeatEventData = {
+        ...eventData,
+        date: date.toISOString().split("T")[0],
+      };
+      await addDoc(eventsCollectionRef, repeatEventData);
+    }
+
     return newEventRef.id;
   } catch (error) {
     console.error("Error adding event to Firebase:", error.message, error.code);

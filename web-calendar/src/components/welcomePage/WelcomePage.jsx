@@ -1,7 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { auth, provider } from "../../../firebase";
-import { signInWithPopup } from "firebase/auth";
+import AuthService from "../../api/auth";
 import "./WelcomePage.css";
 
 const WelcomePage = () => {
@@ -9,10 +8,10 @@ const WelcomePage = () => {
 
   const handleSignIn = async () => {
     try {
-      await signInWithPopup(auth, provider);
+      await AuthService.signInWithGoogle();
       setIsSignedIn(true);
     } catch (error) {
-      console.error("Error signing in:", error.message);
+      console.error(error.message);
     }
   };
 

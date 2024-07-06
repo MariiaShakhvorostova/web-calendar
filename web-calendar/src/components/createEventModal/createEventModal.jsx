@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +12,7 @@ import Textarea from "../textarea/textarea";
 import { db } from "../../../firebase";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import "./createEventModal.css";
+import { createEvent } from "../../api/events";
 
 const eventSchema = z.object({
   title: z
@@ -141,6 +140,7 @@ const CreateEventModal = ({
       calendarIconColor: selectedCalendar.color,
       calendarId: selectedCalendar.id,
       isAllDay: isAllDay,
+      repeat: data.repeat,
     };
 
     try {
@@ -148,9 +148,8 @@ const CreateEventModal = ({
         await updateDoc(doc(db, "events", initialEventData.id), eventDetails);
         onEventUpdated({ ...eventDetails, id: initialEventData.id });
       } else {
-        const eventsCollectionRef = collection(db, "events");
-        const docRef = await addDoc(eventsCollectionRef, eventDetails);
-        onEventAdded({ ...eventDetails, id: docRef.id });
+        await createEvent(eventDetails);
+        onEventAdded(eventDetails);
       }
       onClose();
     } catch (error) {
