@@ -1,13 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
-
 import React, { useState, useEffect } from "react";
 import "./weekView.css";
 import { fetchEvents, deleteEvent } from "../../api/events";
 import EventInformationModal from "../eventInfModal/eventInfModal";
+import CurrentTimeLine from "../currentTimeLine/CurrentTimeLine";
 
 const WeekView = ({
+  userId,
   selectedDate,
   onDaySelect,
   events,
@@ -32,7 +30,7 @@ const WeekView = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsData = await fetchEvents();
+        const eventsData = await fetchEvents(userId);
         setEvents(eventsData);
         setLoading(false);
       } catch (error) {
@@ -41,7 +39,7 @@ const WeekView = ({
       }
     };
     fetchData();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const filteredEvents = events.filter((event) =>
@@ -68,10 +66,10 @@ const WeekView = ({
     setSelectedEvent(event);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (eventId) => {
     try {
-      await deleteEvent(id);
-      setEvents(events.filter((event) => event.id !== id));
+      await deleteEvent(userId, eventId);
+      setEvents(events.filter((event) => event.id !== eventId));
       setSelectedEvent(null);
     } catch (error) {
       console.error("Error deleting event:", error.message, error.code);
@@ -116,6 +114,10 @@ const WeekView = ({
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  const todayIndex = new Date().getDay();
+  const currentHour = new Date().getHours();
+  const isToday = (index) => index === todayIndex;
 
   return (
     <div className="week-view">
@@ -165,6 +167,9 @@ const WeekView = ({
 
                 return (
                   <td key={dayIndex} className="event-cell">
+                    {isToday(dayIndex) && index === currentHour && (
+                      <CurrentTimeLine />
+                    )}
                     {cellEvents.map((event, i) => {
                       const backgroundColor = getBackgroundColor(
                         event.calendarIconColor

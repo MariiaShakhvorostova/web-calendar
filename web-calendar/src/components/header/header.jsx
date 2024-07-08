@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../button/button";
 import Dropdown from "../dropdown/dropdown";
+import { auth } from "../../../firebase";
 import "./header.css";
 
 const Header = ({
@@ -14,12 +15,20 @@ const Header = ({
   onTodayClick,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [username, setUsername] = useState("");
   const [showExit, setShowExit] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     navigate("/welcome");
   };
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setUsername(user.displayName);
+    }
+  }, []);
 
   useEffect(() => {
     setSelectedDate(new Date());
@@ -88,7 +97,7 @@ const Header = ({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            <span>Username</span>
+            <span>{username}</span>
             <div className="user-avatar"></div>
           </div>
           <div className="button-exit">

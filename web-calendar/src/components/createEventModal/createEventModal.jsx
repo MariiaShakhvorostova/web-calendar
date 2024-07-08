@@ -77,6 +77,7 @@ const DateDropdown = ({ selectedDate, onDateChange }) => {
 };
 
 const CreateEventModal = ({
+  userId,
   onClose,
   onEventAdded,
   selectedDate,
@@ -148,7 +149,7 @@ const CreateEventModal = ({
         await updateDoc(doc(db, "events", initialEventData.id), eventDetails);
         onEventUpdated({ ...eventDetails, id: initialEventData.id });
       } else {
-        await createEvent(eventDetails);
+        await createEvent(userId, eventDetails);
         onEventAdded(eventDetails);
       }
       onClose();

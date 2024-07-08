@@ -13,7 +13,12 @@ import {
   updateCalendarCheckbox,
 } from "../../api/calendars";
 
-const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
+const CalendarList = ({
+  userId,
+  onCalendarSelect,
+  setEvents,
+  selectedCalendarIds,
+}) => {
   const [calendars, setCalendars] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -26,24 +31,27 @@ const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const calendarList = await fetchCalendars();
+      const calendarList = await fetchCalendars(userId);
       setCalendars(calendarList);
 
-      const defaultCalendar = calendarList.find(
+      const defaultCalendars = calendarList.filter(
         (cal) => cal.title === "Default"
       );
-      if (!defaultCalendar) {
-        const newDefaultCalendar = await createCalendar({
+      if (defaultCalendars.length === 0) {
+        const newDefaultCalendar = await createCalendar(userId, {
           title: "Default",
           color: "bright-pink",
           isChecked: true,
         });
         setCalendars((prevCalendars) => [...prevCalendars, newDefaultCalendar]);
+      } else if (defaultCalendars.length > 1) {
+        for (let i = 1; i < defaultCalendars.length; i++) {
+          await deleteCalendar(userId, defaultCalendars[i].id);
+        }
       }
     };
-
     fetchData();
-  }, []);
+  }, [userId]);
 
   const handleEditClick = (calendar) => {
     setCurrentCalendar(calendar);
@@ -61,9 +69,9 @@ const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
   const handleSave = async (updatedCalendar) => {
     let newCalendar;
     if (updatedCalendar.id) {
-      newCalendar = await updateCalendar(updatedCalendar);
+      newCalendar = await updateCalendar(userId, updatedCalendar);
     } else {
-      newCalendar = await createCalendar(updatedCalendar);
+      newCalendar = await createCalendar(userId, updatedCalendar);
     }
     setIsEditModalOpen(false);
     setCurrentCalendar({ id: null, title: "", color: "", isChecked: false });
@@ -90,7 +98,7 @@ const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
     if (currentCalendar.title === "Default") {
       return;
     }
-    await deleteCalendar(currentCalendar.id);
+    await deleteCalendar(userId, currentCalendar.id);
     setIsDeleteModalOpen(false);
     setCurrentCalendar({ id: null, title: "", color: "", isChecked: false });
     setCalendars((prevCalendars) =>
@@ -103,7 +111,7 @@ const CalendarList = ({ onCalendarSelect, setEvents, selectedCalendarIds }) => {
   };
 
   const handleCheckboxChange = async (id, isChecked) => {
-    await updateCalendarCheckbox(id, isChecked);
+    await updateCalendarCheckbox(userId, id, isChecked);
     setCalendars((prevCalendars) =>
       prevCalendars.map((cal) => (cal.id === id ? { ...cal, isChecked } : cal))
     );

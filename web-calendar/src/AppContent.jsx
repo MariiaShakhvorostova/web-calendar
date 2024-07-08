@@ -8,6 +8,7 @@ import CreateEventModal from "./components/createEventModal/createEventModal";
 import "./App.css";
 import { fetchCalendars } from "./api/calendars";
 import { fetchEvents } from "./api/events";
+import { auth } from "../firebase";
 
 function AppContent() {
   const [calendars, setCalendars] = useState([]);
@@ -17,10 +18,22 @@ function AppContent() {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedCalendarIds, setSelectedCalendarIds] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const calendarList = await fetchCalendars();
+      if (!user) return;
+      const calendarList = await fetchCalendars(user.uid);
       setCalendars(calendarList);
 
       const checkedCalendarIds = calendarList
@@ -29,12 +42,12 @@ function AppContent() {
       setSelectedCalendarIds(checkedCalendarIds);
 
       if (checkedCalendarIds.length > 0) {
-        const eventsData = await fetchEvents();
+        const eventsData = await fetchEvents(user.uid);
         setEvents(eventsData);
       }
     };
     fetchData();
-  }, []);
+  }, [user]);
 
   const handleCalendarSelect = async ({ id, isChecked }) => {
     const updatedSelectedCalendarIds = isChecked
@@ -43,7 +56,7 @@ function AppContent() {
 
     setSelectedCalendarIds(updatedSelectedCalendarIds);
 
-    const newEvents = await fetchEvents();
+    const newEvents = await fetchEvents(user.uid);
     setEvents(
       newEvents.filter((event) =>
         updatedSelectedCalendarIds.includes(event.calendarId)
@@ -110,6 +123,8 @@ function AppContent() {
     setIsCreateEventModalOpen(true);
   };
 
+  if (!user) return <div>Loading...</div>;
+
   return (
     <>
       <Header
@@ -130,6 +145,7 @@ function AppContent() {
       </div>
       <Datepicker value={selectedDate} onChange={handleDateChange} />
       <CalendarList
+        userId={user.uid}
         calendars={calendars}
         onEdit={handleEditCalendar}
         onDelete={handleDeleteCalendar}
@@ -139,6 +155,7 @@ function AppContent() {
         selectedCalendarIds={selectedCalendarIds}
       />
       <CentralCalendar
+        userId={user.uid}
         date={selectedDate}
         view={selectedView}
         events={events}
@@ -148,6 +165,7 @@ function AppContent() {
       />
       {isCreateEventModalOpen && (
         <CreateEventModal
+          userId={user.uid}
           selectedDate={selectedDate}
           onClose={() => setIsCreateEventModalOpen(false)}
           onEventAdded={handleEventAdded}

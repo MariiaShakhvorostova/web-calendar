@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from "react";
 import "./dayView.css";
 import { fetchEvents, deleteEvent } from "../../api/events";
+import CurrentTimeLine from "../currentTimeLine/CurrentTimeLine";
 import EventInformationModal from "../eventInfModal/eventInfModal";
 
 const DayView = ({
+  userId,
   selectedDate,
   events,
   setEvents,
@@ -13,6 +15,12 @@ const DayView = ({
   selectedCalendarIds,
 }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [currentTimeVisible, setCurrentTimeVisible] = useState(false);
+
+  useEffect(() => {
+    const now = new Date();
+    setCurrentTimeVisible(true);
+  }, []);
 
   const times = Array.from({ length: 24 }, (_, i) => {
     const hour = i < 10 ? "0" + i : i;
@@ -23,14 +31,14 @@ const DayView = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsData = await fetchEvents();
+        const eventsData = await fetchEvents(userId);
         setEvents(eventsData);
       } catch (error) {
         console.error("Error fetching events:", error.message, error.code);
       }
     };
     fetchData();
-  }, [selectedDate, setEvents]);
+  }, [userId]);
 
   const filteredEvents = selectedCalendarIds
     ? events.filter((event) => selectedCalendarIds.includes(event.calendarId))
@@ -40,10 +48,10 @@ const DayView = ({
     setSelectedEvent(event);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (eventId) => {
     try {
-      await deleteEvent(id);
-      setEvents(events.filter((event) => event.id !== id));
+      await deleteEvent(userId, eventId);
+      setEvents(events.filter((event) => event.id !== eventId));
       setSelectedEvent(null);
     } catch (error) {
       console.error("Error deleting event:", error.message, error.code);
@@ -105,43 +113,51 @@ const DayView = ({
           </tr>
         </thead>
         <tbody>
-          {times.map((time, index) => (
-            <tr key={index}>
-              <td>{time}</td>
-              <td className="event-cell">
-                {filteredEvents
-                  .filter(
-                    (event) =>
-                      event.date ===
-                        (selectedDate
-                          ? selectedDate.toISOString().split("T")[0]
-                          : "") && event.startTime === time
-                  )
-                  .map((event, i) => {
-                    const backgroundColor = getBackgroundColor(
-                      event.calendarIconColor
-                    );
-                    return (
-                      <div
-                        key={i}
-                        className="event"
-                        onClick={() => handleEventClick(event)}
-                        style={{ backgroundColor: `${backgroundColor}4D` }}
-                      >
-                        {event.title}
+          {times.map((time, index) => {
+            const currentHour = new Date().getHours();
+            const isCurrentHour = time.includes(`${currentHour}:00`);
+
+            return (
+              <tr key={index}>
+                <td>{time}</td>
+                <td className="event-cell">
+                  {filteredEvents
+                    .filter(
+                      (event) =>
+                        event.date ===
+                          (selectedDate
+                            ? selectedDate.toISOString().split("T")[0]
+                            : "") && event.startTime === time
+                    )
+                    .map((event, i) => {
+                      const backgroundColor = getBackgroundColor(
+                        event.calendarIconColor
+                      );
+                      return (
                         <div
+                          key={i}
+                          className="event"
+                          onClick={() => handleEventClick(event)}
                           style={{
-                            backgroundImage: `url(/src/assets/imgs/colors/${event.calendarIconColor}.png)`,
-                            backgroundColor: backgroundColor,
+                            backgroundColor: `${backgroundColor}4D`,
                           }}
-                          className="vertical-line day-line"
-                        ></div>
-                      </div>
-                    );
-                  })}
-              </td>
-            </tr>
-          ))}
+                        >
+                          {event.title}
+                          <div
+                            style={{
+                              backgroundImage: `url(/src/assets/imgs/colors/${event.calendarIconColor}.png)`,
+                              backgroundColor: backgroundColor,
+                            }}
+                            className="vertical-line day-line"
+                          ></div>
+                        </div>
+                      );
+                    })}
+                  {isCurrentHour && currentTimeVisible && <CurrentTimeLine />}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       {selectedEvent && (
@@ -149,7 +165,7 @@ const DayView = ({
           event={selectedEvent}
           onClose={closeEventInformationModal}
           onEdit={() => onEventEdit(selectedEvent)}
-          onDelete={handleDelete}
+          onDelete={() => handleDelete(selectedEvent.id)}
         />
       )}
     </div>
