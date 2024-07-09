@@ -19,6 +19,8 @@ function AppContent() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedCalendarIds, setSelectedCalendarIds] = useState([]);
   const [user, setUser] = useState(null);
+  const [selectedStartTime, setSelectedStartTime] = useState(null);
+  const [selectedEndTime, setSelectedEndTime] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -123,6 +125,14 @@ function AppContent() {
     setIsCreateEventModalOpen(true);
   };
 
+  const handleEventCreate = (date, startTime, endTime) => {
+    setSelectedDate(date);
+    setSelectedStartTime(startTime);
+    setSelectedEndTime(endTime);
+    setSelectedEvent(null);
+    setIsCreateEventModalOpen(true);
+  };
+
   if (!user) return <div>Loading...</div>;
 
   return (
@@ -162,6 +172,7 @@ function AppContent() {
         setEvents={setEvents}
         onEventEdit={handleEventEdit}
         selectedCalendarIds={selectedCalendarIds}
+        onEventCreate={handleEventCreate}
       />
       {isCreateEventModalOpen && (
         <CreateEventModal
@@ -172,6 +183,8 @@ function AppContent() {
           onEventUpdated={handleEventUpdated}
           initialEventData={selectedEvent}
           calendars={calendars}
+          selectedStartTime={selectedStartTime}
+          selectedEndTime={selectedEndTime}
         />
       )}
     </>

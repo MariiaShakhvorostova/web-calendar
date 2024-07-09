@@ -30,8 +30,10 @@ export const createEvent = async (userId, eventData) => {
     userId,
   });
 
+  const createdEvents = [{ id: newEventRef.id, ...eventData, userId }];
+
   if (!eventData.repeat || eventData.repeat === "Does not repeat") {
-    return newEventRef.id;
+    return createdEvents;
   }
 
   const repeatDates = calculateRepeatDates(eventData.date, eventData.repeat);
@@ -42,10 +44,11 @@ export const createEvent = async (userId, eventData) => {
       date: date.toISOString().split("T")[0],
       userId,
     };
-    await addDoc(eventsCollectionRef, repeatEventData);
+    const repeatEventRef = await addDoc(eventsCollectionRef, repeatEventData);
+    createdEvents.push({ id: repeatEventRef.id, ...repeatEventData, userId });
   }
 
-  return newEventRef.id;
+  return createdEvents;
 };
 
 export const deleteEvent = async (userId, eventId) => {

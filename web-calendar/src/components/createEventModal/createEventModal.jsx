@@ -84,6 +84,8 @@ const CreateEventModal = ({
   calendars,
   initialEventData = null,
   onEventUpdated,
+  selectedStartTime,
+  selectedEndTime,
 }) => {
   const [eventDate, setEventDate] = useState(
     initialEventData
@@ -101,9 +103,7 @@ const CreateEventModal = ({
         }
       : { color: "", title: "Choose calendar" }
   );
-  const [description, setDescription] = useState(
-    initialEventData ? initialEventData.description : ""
-  );
+
   const [isAllDay, setIsAllDay] = useState(
     initialEventData ? initialEventData.isAllDay : false
   );
@@ -112,18 +112,27 @@ const CreateEventModal = ({
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       title: initialEventData ? initialEventData.title : "",
-      startTime: initialEventData ? initialEventData.startTime : "",
-      endTime: initialEventData ? initialEventData.endTime : "",
+      startTime: initialEventData
+        ? initialEventData.startTime
+        : selectedStartTime,
+      endTime: initialEventData ? initialEventData.endTime : selectedEndTime,
       calendar: initialEventData ? initialEventData.calendar : "",
       description: initialEventData ? initialEventData.description : "",
       isAllDay: initialEventData ? initialEventData.isAllDay : false,
       repeat: initialEventData ? initialEventData.repeat : "Does not repeat",
     },
   });
+
+  useEffect(() => {
+    setValue("startTime", selectedStartTime);
+    setValue("endTime", selectedEndTime);
+  }, [selectedStartTime, selectedEndTime, setValue]);
 
   const repeatOptions = [
     "Does not repeat",
@@ -149,8 +158,8 @@ const CreateEventModal = ({
         await updateDoc(doc(db, "events", initialEventData.id), eventDetails);
         onEventUpdated({ ...eventDetails, id: initialEventData.id });
       } else {
-        await createEvent(userId, eventDetails);
-        onEventAdded(eventDetails);
+        const createdEvents = await createEvent(userId, eventDetails);
+        createdEvents.forEach((event) => onEventAdded(event));
       }
       onClose();
     } catch (error) {
@@ -233,10 +242,12 @@ const CreateEventModal = ({
                           setIsEndTimeMenuOpen(!isEndTimeMenuOpen)
                         }
                         placeholder="End Time"
+                        initialStartTime={watch("startTime")}
                       />
                     )}
                   />
                 </div>
+
                 {errors.startTime && (
                   <span className="error-message err-start">
                     {errors.startTime.message}

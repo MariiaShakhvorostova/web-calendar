@@ -13,6 +13,7 @@ const DayView = ({
   setEvents,
   onEventEdit,
   selectedCalendarIds,
+  onEventCreate,
 }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentTimeVisible, setCurrentTimeVisible] = useState(false);
@@ -60,6 +61,14 @@ const DayView = ({
 
   const closeEventInformationModal = () => {
     setSelectedEvent(null);
+  };
+
+  const handleCellClick = (startTime) => {
+    const [startHour] = startTime.split(":");
+    const endHour = parseInt(startHour, 10) + 1;
+    const endTime = `${endHour < 10 ? "0" + endHour : endHour}:00`;
+
+    onEventCreate(selectedDate, startTime, endTime);
   };
 
   const getBackgroundColor = (iconColor) => {
@@ -120,7 +129,10 @@ const DayView = ({
             return (
               <tr key={index}>
                 <td>{time}</td>
-                <td className="event-cell">
+                <td
+                  className="event-cell"
+                  onClick={() => handleCellClick(time)}
+                >
                   {filteredEvents
                     .filter(
                       (event) =>

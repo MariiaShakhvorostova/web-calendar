@@ -12,6 +12,7 @@ const WeekView = ({
   setEvents,
   onEventEdit,
   selectedCalendarIds,
+  onEventCreate,
 }) => {
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const times = Array.from({ length: 24 }, (_, i) => {
@@ -119,6 +120,17 @@ const WeekView = ({
   const currentHour = new Date().getHours();
   const isToday = (index) => index === todayIndex;
 
+  const handleCellClick = (dayIndex, startTime) => {
+    const date = new Date(startOfWeek);
+    date.setDate(startOfWeek.getDate() + dayIndex);
+
+    const [startHour] = startTime.split(":");
+    const endHour = parseInt(startHour, 10) + 1;
+    const endTime = `${endHour < 10 ? "0" + endHour : endHour}:00`;
+
+    onEventCreate(date, startTime, endTime);
+  };
+
   return (
     <div className="week-view">
       <table>
@@ -166,7 +178,17 @@ const WeekView = ({
                 });
 
                 return (
-                  <td key={dayIndex} className="event-cell">
+                  <td
+                    key={dayIndex}
+                    className="event-cell"
+                    onClick={() => {
+                      if (cellEvents.length > 0) {
+                        handleEventClick(cellEvents[0]);
+                      } else {
+                        handleCellClick(dayIndex, times[index]);
+                      }
+                    }}
+                  >
                     {isToday(dayIndex) && index === currentHour && (
                       <CurrentTimeLine />
                     )}
