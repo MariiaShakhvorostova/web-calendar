@@ -40,7 +40,7 @@ const WeekView = ({
       }
     };
     fetchData();
-  }, [userId]);
+  }, [userId, setEvents]);
 
   useEffect(() => {
     const filteredEvents = events.filter((event) =>
@@ -131,6 +131,16 @@ const WeekView = ({
     onEventCreate(date, startTime, endTime);
   };
 
+  const calculateEventHeight = (startTime, endTime) => {
+    const [startHour] = startTime.split(":");
+    const [endHour] = endTime.split(":");
+    const startHourNum = parseInt(startHour, 10);
+    const endHourNum = parseInt(endHour, 10);
+
+    const totalHours = endHourNum - startHourNum;
+    return totalHours * 96;
+  };
+
   return (
     <div className="week-view">
       <table>
@@ -149,10 +159,10 @@ const WeekView = ({
                     <div>{getWeekDates()[index].getDate()}</div>
                   </div>
                 ) : (
-                  <>
+                  <div>
                     <div>{day}</div>
                     <div>{getWeekDates()[index].getDate()}</div>
-                  </>
+                  </div>
                 )}
               </th>
             ))}
@@ -196,12 +206,26 @@ const WeekView = ({
                       const backgroundColor = getBackgroundColor(
                         event.calendarIconColor
                       );
+                      const eventHeight = calculateEventHeight(
+                        event.startTime,
+                        event.endTime
+                      );
+                      const startHourNum = parseInt(
+                        event.startTime.split(":")[0],
+                        10
+                      );
+                      const eventTop =
+                        (startHourNum - parseInt(time.split(":")[0], 10)) * 134;
                       return (
                         <div
                           key={i}
                           className="event"
                           onClick={() => handleEventClick(event)}
-                          style={{ backgroundColor: `${backgroundColor}4D` }}
+                          style={{
+                            backgroundColor: `${backgroundColor}4D`,
+                            height: `${eventHeight}px`,
+                            top: `${eventTop}px`,
+                          }}
                         >
                           {event.title}
                           <div
@@ -226,7 +250,7 @@ const WeekView = ({
           event={selectedEvent}
           onClose={closeEventInformationModal}
           onEdit={() => onEventEdit(selectedEvent)}
-          onDelete={handleDelete}
+          onDelete={() => handleDelete(selectedEvent.id)}
         />
       )}
     </div>

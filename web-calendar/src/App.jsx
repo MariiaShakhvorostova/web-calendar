@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -7,10 +7,11 @@ import {
 } from "react-router-dom";
 import WelcomePage from "./components/welcomePage/WelcomePage";
 import AppContent from "./AppContent";
+import { useAppState } from "./AppStateContext";
 import { auth } from "../firebase";
 
 function App() {
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useAppState();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -18,7 +19,7 @@ function App() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [setUser]);
 
   return (
     <Router>
