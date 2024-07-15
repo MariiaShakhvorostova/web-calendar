@@ -25,8 +25,7 @@ const DayView = ({
 
   const times = Array.from({ length: 24 }, (_, i) => {
     const hour = i < 10 ? "0" + i : i;
-    const period = i < 12 ? "am" : "pm";
-    return `${hour}:00 ${period}`;
+    return `${hour}:00`;
   });
 
   useEffect(() => {
@@ -69,6 +68,32 @@ const DayView = ({
     const endTime = `${endHour < 10 ? "0" + endHour : endHour}:00`;
 
     onEventCreate(selectedDate, startTime, endTime);
+  };
+
+  const calculateEventHeight = (startTime, endTime) => {
+    const [startHour, startMinute] = startTime.split(":");
+    const [endHour, endMinute] = endTime.split(":");
+
+    const startHourNum = parseInt(startHour, 10);
+    const startMinuteNum = parseInt(startMinute, 10);
+    const endHourNum = parseInt(endHour, 10);
+    const endMinuteNum = parseInt(endMinute, 10);
+
+    const totalStartMinutes = startHourNum * 60 + startMinuteNum;
+    const totalEndMinutes = endHourNum * 60 + endMinuteNum;
+    const totalMinutes = totalEndMinutes - totalStartMinutes;
+
+    return (totalMinutes / 60) * 81;
+  };
+
+  const calculateEventTop = (startTime) => {
+    const [startHour, startMinute] = startTime.split(":");
+    const startHourNum = parseInt(startHour, 10);
+    const startMinuteNum = parseInt(startMinute, 10);
+
+    const totalMinutes = startHourNum + startMinuteNum;
+
+    return (totalMinutes / 60) * 81;
   };
 
   const getBackgroundColor = (iconColor) => {
@@ -131,7 +156,25 @@ const DayView = ({
                 <td>{time}</td>
                 <td
                   className="event-cell"
-                  onClick={() => handleCellClick(time)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const cellEvent = filteredEvents.find((event) => {
+                      const [eventStartHour] = event.startTime.split(":");
+                      return (
+                        event.date ===
+                          (selectedDate
+                            ? selectedDate.toISOString().split("T")[0]
+                            : "") && parseInt(eventStartHour, 10) === index
+                      );
+                    });
+
+                    if (cellEvent) {
+                      handleEventClick(cellEvent);
+                    } else {
+                      handleCellClick(time);
+                    }
+                  }}
+                  style={{ position: "relative" }}
                 >
                   {filteredEvents
                     .filter(
@@ -139,12 +182,19 @@ const DayView = ({
                         event.date ===
                           (selectedDate
                             ? selectedDate.toISOString().split("T")[0]
-                            : "") && event.startTime === time
+                            : "") &&
+                        parseInt(event.startTime.split(":")[0], 10) === index
                     )
                     .map((event, i) => {
                       const backgroundColor = getBackgroundColor(
                         event.calendarIconColor
                       );
+                      const eventHeight = calculateEventHeight(
+                        event.startTime,
+                        event.endTime
+                      );
+                      const eventTop = calculateEventTop(event.startTime);
+
                       return (
                         <div
                           key={i}
@@ -152,6 +202,10 @@ const DayView = ({
                           onClick={() => handleEventClick(event)}
                           style={{
                             backgroundColor: `${backgroundColor}4D`,
+                            height: `${eventHeight}px`,
+                            top: `${eventTop}px`,
+                            position: "absolute",
+                            width: "100%",
                           }}
                         >
                           {event.title}

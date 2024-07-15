@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import "./weekView.css";
 import { fetchEvents, deleteEvent } from "../../api/events";
@@ -17,8 +19,7 @@ const WeekView = ({
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const times = Array.from({ length: 24 }, (_, i) => {
     const hour = i < 10 ? "0" + i : i;
-    const period = i < 12 ? "am" : "pm";
-    return `${hour}:00 ${period}`;
+    return `${hour}:00`;
   });
 
   const startOfWeek = new Date(selectedDate);
@@ -132,13 +133,29 @@ const WeekView = ({
   };
 
   const calculateEventHeight = (startTime, endTime) => {
-    const [startHour] = startTime.split(":");
-    const [endHour] = endTime.split(":");
-    const startHourNum = parseInt(startHour, 10);
-    const endHourNum = parseInt(endHour, 10);
+    const [startHour, startMinute] = startTime.split(":");
+    const [endHour, endMinute] = endTime.split(":");
 
-    const totalHours = endHourNum - startHourNum;
-    return totalHours * 96;
+    const startHourNum = parseInt(startHour, 10);
+    const startMinuteNum = parseInt(startMinute, 10);
+    const endHourNum = parseInt(endHour, 10);
+    const endMinuteNum = parseInt(endMinute, 10);
+
+    const totalStartMinutes = startHourNum * 60 + startMinuteNum;
+    const totalEndMinutes = endHourNum * 60 + endMinuteNum;
+    const totalMinutes = totalEndMinutes - totalStartMinutes;
+
+    return (totalMinutes / 60) * 96;
+  };
+
+  const calculateEventTop = (startTime) => {
+    const [startHour, startMinute] = startTime.split(":");
+    const startHourNum = parseInt(startHour, 10);
+    const startMinuteNum = parseInt(startMinute, 10);
+
+    const totalMinutes = startHourNum + startMinuteNum;
+
+    return (totalMinutes / 60) * 96;
   };
 
   return (
@@ -182,8 +199,7 @@ const WeekView = ({
                   return (
                     eventDate.getDate() === currentDate.getDate() &&
                     eventDate.getMonth() === currentDate.getMonth() &&
-                    eventDate.getFullYear() === currentDate.getFullYear() &&
-                    event.startTime === times[index]
+                    eventDate.getFullYear() === currentDate.getFullYear()
                   );
                 });
 
@@ -191,53 +207,81 @@ const WeekView = ({
                   <td
                     key={dayIndex}
                     className="event-cell"
-                    onClick={() => {
-                      if (cellEvents.length > 0) {
-                        handleEventClick(cellEvents[0]);
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const cellEvent = cellEvents.find((event) => {
+                        const startHour = parseInt(
+                          event.startTime.split(":")[0],
+                          10
+                        );
+                        const endHour = parseInt(
+                          event.endTime.split(":")[0],
+                          10
+                        );
+                        return startHour === index || endHour === index;
+                      });
+
+                      if (cellEvent) {
+                        handleEventClick(cellEvent);
                       } else {
                         handleCellClick(dayIndex, times[index]);
                       }
                     }}
+                    style={{ position: "relative" }}
                   >
                     {isToday(dayIndex) && index === currentHour && (
                       <CurrentTimeLine />
                     )}
-                    {cellEvents.map((event, i) => {
-                      const backgroundColor = getBackgroundColor(
-                        event.calendarIconColor
-                      );
-                      const eventHeight = calculateEventHeight(
-                        event.startTime,
-                        event.endTime
-                      );
-                      const startHourNum = parseInt(
-                        event.startTime.split(":")[0],
-                        10
-                      );
-                      const eventTop =
-                        (startHourNum - parseInt(time.split(":")[0], 10)) * 134;
-                      return (
-                        <div
-                          key={i}
-                          className="event"
-                          onClick={() => handleEventClick(event)}
-                          style={{
-                            backgroundColor: `${backgroundColor}4D`,
-                            height: `${eventHeight}px`,
-                            top: `${eventTop}px`,
-                          }}
-                        >
-                          {event.title}
-                          <div
-                            style={{
-                              backgroundImage: `url(/src/assets/imgs/colors/${event.calendarIconColor}.png)`,
-                              backgroundColor: backgroundColor,
-                            }}
-                            className="vertical-line"
-                          ></div>
-                        </div>
-                      );
-                    })}
+                    {cellEvents
+                      .filter((event) => {
+                        const startHour = parseInt(
+                          event.startTime.split(":")[0],
+                          10
+                        );
+                        const endHour = parseInt(
+                          event.endTime.split(":")[0],
+                          10
+                        );
+                        return startHour === index || endHour === index;
+                      })
+                      .map((event, i) => {
+                        if (
+                          parseInt(event.startTime.split(":")[0], 10) === index
+                        ) {
+                          const backgroundColor = getBackgroundColor(
+                            event.calendarIconColor
+                          );
+                          const eventHeight = calculateEventHeight(
+                            event.startTime,
+                            event.endTime
+                          );
+                          const eventTop = calculateEventTop(event.startTime);
+
+                          return (
+                            <div
+                              key={i}
+                              className="event"
+                              onClick={() => handleEventClick(event)}
+                              style={{
+                                backgroundColor: `${backgroundColor}4D`,
+                                height: `${eventHeight}px`,
+                                top: `${eventTop}px`,
+                                position: "absolute",
+                                width: "100%",
+                              }}
+                            >
+                              {event.title}
+                              <div
+                                style={{
+                                  backgroundImage: `url(/src/assets/imgs/colors/${event.calendarIconColor}.png)`,
+                                  backgroundColor: backgroundColor,
+                                }}
+                                className="vertical-line"
+                              ></div>
+                            </div>
+                          );
+                        }
+                      })}
                   </td>
                 );
               })}
