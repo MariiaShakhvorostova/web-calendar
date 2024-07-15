@@ -6,6 +6,9 @@ import { fetchEvents, deleteEvent } from "../../api/events";
 import EventInformationModal from "../eventInfModal/eventInfModal";
 import CurrentTimeLine from "../currentTimeLine/CurrentTimeLine";
 
+const HOUR_HEIGHT = 96;
+const MINUTES_IN_HOUR = 60;
+
 const WeekView = ({
   userId,
   selectedDate,
@@ -141,21 +144,20 @@ const WeekView = ({
     const endHourNum = parseInt(endHour, 10);
     const endMinuteNum = parseInt(endMinute, 10);
 
-    const totalStartMinutes = startHourNum * 60 + startMinuteNum;
-    const totalEndMinutes = endHourNum * 60 + endMinuteNum;
+    const totalStartMinutes = startHourNum * MINUTES_IN_HOUR + startMinuteNum;
+    const totalEndMinutes = endHourNum * MINUTES_IN_HOUR + endMinuteNum;
     const totalMinutes = totalEndMinutes - totalStartMinutes;
 
-    return (totalMinutes / 60) * 96;
+    return (totalMinutes / MINUTES_IN_HOUR) * HOUR_HEIGHT;
   };
 
   const calculateEventTop = (startTime) => {
     const [startHour, startMinute] = startTime.split(":");
-    const startHourNum = parseInt(startHour, 10);
     const startMinuteNum = parseInt(startMinute, 10);
 
-    const totalMinutes = startHourNum + startMinuteNum;
+    const totalMinutes = startMinuteNum;
 
-    return (totalMinutes / 60) * 96;
+    return (totalMinutes / MINUTES_IN_HOUR) * HOUR_HEIGHT;
   };
 
   return (

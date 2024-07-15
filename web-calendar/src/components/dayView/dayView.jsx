@@ -6,6 +6,9 @@ import { fetchEvents, deleteEvent } from "../../api/events";
 import CurrentTimeLine from "../currentTimeLine/CurrentTimeLine";
 import EventInformationModal from "../eventInfModal/eventInfModal";
 
+const HOUR_HEIGHT = 81;
+const MINUTES_IN_HOUR = 60;
+
 const DayView = ({
   userId,
   selectedDate,
@@ -79,11 +82,11 @@ const DayView = ({
     const endHourNum = parseInt(endHour, 10);
     const endMinuteNum = parseInt(endMinute, 10);
 
-    const totalStartMinutes = startHourNum * 60 + startMinuteNum;
-    const totalEndMinutes = endHourNum * 60 + endMinuteNum;
+    const totalStartMinutes = startHourNum * MINUTES_IN_HOUR + startMinuteNum;
+    const totalEndMinutes = endHourNum * MINUTES_IN_HOUR + endMinuteNum;
     const totalMinutes = totalEndMinutes - totalStartMinutes;
 
-    return (totalMinutes / 60) * 81;
+    return (totalMinutes / MINUTES_IN_HOUR) * HOUR_HEIGHT;
   };
 
   const calculateEventTop = (startTime) => {
@@ -91,9 +94,9 @@ const DayView = ({
     const startHourNum = parseInt(startHour, 10);
     const startMinuteNum = parseInt(startMinute, 10);
 
-    const totalMinutes = startHourNum + startMinuteNum;
+    const totalMinutes = startMinuteNum;
 
-    return (totalMinutes / 60) * 81;
+    return (totalMinutes / MINUTES_IN_HOUR) * HOUR_HEIGHT;
   };
 
   const getBackgroundColor = (iconColor) => {
