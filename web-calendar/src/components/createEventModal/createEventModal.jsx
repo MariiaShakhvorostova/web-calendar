@@ -13,6 +13,8 @@ import { db } from "../../../firebase";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import "./createEventModal.css";
 import { createEvent } from "../../api/events";
+import useAppStore from "../../useAppStore";
+import { fetchCalendars } from "../../api/calendars";
 
 const eventSchema = z.object({
   title: z
@@ -108,6 +110,8 @@ const CreateEventModal = ({
     initialEventData ? initialEventData.isAllDay : false
   );
 
+  const { setCalendars } = useAppStore();
+
   const {
     control,
     handleSubmit,
@@ -133,6 +137,14 @@ const CreateEventModal = ({
     setValue("startTime", selectedStartTime);
     setValue("endTime", selectedEndTime);
   }, [selectedStartTime, selectedEndTime, setValue]);
+
+  useEffect(() => {
+    const fetchAndSetCalendars = async () => {
+      const newCalendars = await fetchCalendars(userId);
+      setCalendars(newCalendars);
+    };
+    fetchAndSetCalendars();
+  }, [setCalendars, userId]);
 
   const repeatOptions = [
     "Does not repeat",
@@ -160,6 +172,9 @@ const CreateEventModal = ({
       } else {
         const createdEvents = await createEvent(userId, eventDetails);
         createdEvents.forEach((event) => onEventAdded(event));
+
+        const newCalendars = await fetchCalendars(userId);
+        setCalendars(newCalendars);
       }
       onClose();
     } catch (error) {

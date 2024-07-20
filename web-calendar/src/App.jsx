@@ -7,19 +7,22 @@ import {
 } from "react-router-dom";
 import WelcomePage from "./components/welcomePage/WelcomePage";
 import AppContent from "./AppContent";
-import { useAppState } from "./AppStateContext";
+import useAppStore from "./useAppStore";
 import { auth } from "../firebase";
 
 function App() {
-  const { user, setUser } = useAppState();
+  const { user, setUser, fetchInitialData } = useAppStore();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
+      if (user) {
+        await fetchInitialData(user.uid);
+      }
     });
 
     return () => unsubscribe();
-  }, [setUser]);
+  }, [setUser, fetchInitialData]);
 
   return (
     <Router>

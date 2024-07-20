@@ -6,7 +6,8 @@ import CalendarList from "./components/calendarList/calendarList";
 import CentralCalendar from "./components/centralCalendar/centralCalendar";
 import CreateEventModal from "./components/createEventModal/createEventModal";
 import "./App.css";
-import { useAppState } from "./AppStateContext";
+import useAppStore from "./useAppStore";
+import { fetchEvents } from "./api/events";
 
 function AppContent() {
   const {
@@ -25,11 +26,31 @@ function AppContent() {
     selectedCalendarIds,
     setSelectedCalendarIds,
     user,
-    selectedStartTime,
     setSelectedStartTime,
-    selectedEndTime,
+    selectedStartTime,
     setSelectedEndTime,
-  } = useAppState();
+    selectedEndTime,
+  } = useAppStore((state) => ({
+    calendars: state.calendars,
+    setCalendars: state.setCalendars,
+    selectedDate: state.selectedDate,
+    setSelectedDate: state.setSelectedDate,
+    selectedView: state.selectedView,
+    setSelectedView: state.setSelectedView,
+    isCreateEventModalOpen: state.isCreateEventModalOpen,
+    setIsCreateEventModalOpen: state.setIsCreateEventModalOpen,
+    events: state.events,
+    setEvents: state.setEvents,
+    selectedEvent: state.selectedEvent,
+    setSelectedEvent: state.setSelectedEvent,
+    selectedCalendarIds: state.selectedCalendarIds,
+    setSelectedCalendarIds: state.setSelectedCalendarIds,
+    user: state.user,
+    setSelectedStartTime: state.setSelectedStartTime,
+    selectedStartTime: state.selectedStartTime,
+    setSelectedEndTime: state.setSelectedEndTime,
+    selectedEndTime: state.selectedEndTime,
+  }));
 
   const handleCalendarSelect = async ({ id, isChecked }) => {
     const updatedSelectedCalendarIds = isChecked
@@ -121,19 +142,26 @@ function AppContent() {
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
         selectedView={selectedView}
-        onViewChange={handleViewChange}
-        onTodayClick={handleTodayClick}
+        onViewChange={setSelectedView}
+        onTodayClick={() => {
+          const today = new Date();
+          setSelectedDate(today);
+          setSelectedView("Day");
+        }}
       />
       <div className="button-container">
         <Button
           type={"longer"}
           disabled={false}
-          onClick={handleCreateEventModalOpen}
+          onClick={() => {
+            setSelectedEvent(null);
+            setIsCreateEventModalOpen(true);
+          }}
         >
           Create
         </Button>
       </div>
-      <Datepicker value={selectedDate} onChange={handleDateChange} />
+      <Datepicker value={selectedDate} onChange={setSelectedDate} />
       <CalendarList
         userId={user.uid}
         calendars={calendars}
