@@ -6,7 +6,7 @@ import { GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARABxP7GXpGxJ2b5uwhoiiDkbbZMvxAgU",
-  authDomain: "webcalendar-377bb.firebaseapp.com",
+  authDomain: "webcalendar-377bb.web.app",
   projectId: "webcalendar-377bb",
   storageBucket: "webcalendar-377bb.appspot.com",
   messagingSenderId: "467584309604",
